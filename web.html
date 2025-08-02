@@ -1,76 +1,64 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>頂大材料 vs 中字輩電機：互動比較儀表板</title>
+    <title>台灣頂尖工程領域策略選擇指南</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Calm Harmony -->
-    <!-- Application Structure Plan: A dashboard-style SPA with a main toggle to switch between "Materials" and "Electrical" disciplines. The structure includes thematic sections for Overview, Academics, Career, Industry Trends, and Interdisciplinary Studies. This non-linear, comparative approach was chosen to allow users to easily contrast the two fields based on their interests, rather than following the linear flow of the source report. Key interactions include the main toggle, university selectors, and interactive charts to make complex data digestible and facilitate informed decision-making. -->
-    <!-- Visualization & Content Choices: 
-        - Report Info: Salary Data -> Goal: Compare -> Viz: Grouped Bar Chart (Chart.js) -> Interaction: Hover for tooltips -> Justification: Direct, visual comparison of a key decision factor.
-        - Report Info: Career Paths -> Goal: Inform -> Viz: Interactive Cards (HTML/CSS) -> Interaction: Hover effects -> Justification: More engaging and scannable than a list.
-        - Report Info: University Details -> Goal: Organize -> Viz: Tabbed Interface (JS) -> Interaction: Click to switch university -> Justification: Manages large text blocks, preventing a "wall of text" and allowing focused comparison.
-        - Report Info: Industry Talent Demand -> Goal: Show Change/Proportion -> Viz: Donut Chart (Chart.js) -> Interaction: Hover for details -> Justification: Quickly conveys the scale of talent gaps in key sectors.
-        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. All visualizations are Canvas-based or pure HTML/CSS.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Inter', 'Noto Sans TC', sans-serif;
-            background-color: #F8F7F4;
-            color: #333;
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
         }
         .nav-link {
-            transition: color 0.3s, border-bottom-color 0.3s;
+            transition: color 0.3s, border-color 0.3s;
         }
-        .nav-link:hover, .nav-link.active {
-            color: #4A908A;
-            border-bottom-color: #4A908A;
+        .nav-link:hover {
+            color: #0056b3;
+            border-bottom-color: #0056b3;
+        }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background-color: #007bff;
+            margin-top: 1rem;
         }
         .tab-button {
-            transition: all 0.3s;
+            transition: all 0.3s ease;
         }
         .tab-button.active {
-            background-color: #4A908A;
+            background-color: #007bff;
             color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .tab-button:not(.active) {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
         }
         .card {
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-        }
-        .section-title-icon {
-            color: #4A908A;
-        }
-        .toggle-bg:before {
-            content: '';
-            position: absolute;
-            width: 50%;
-            height: 100%;
-            background-color: #4A908A;
-            border-radius: 9999px;
-            transition: transform 0.3s ease-in-out;
-            transform: translateX(0);
-        }
-        .toggle-bg.translate-x-full:before {
-            transform: translateX(100%);
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #dee2e6;
         }
         .chart-container {
             position: relative;
             width: 100%;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
             height: 300px;
-            max-height: 400px;
+            max-height: 40vh;
         }
         @media (min-width: 768px) {
             .chart-container {
@@ -80,469 +68,313 @@
     </style>
 </head>
 <body class="antialiased">
-    <header class="bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
-        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center">
-                    <span class="font-bold text-xl text-[#4A908A]">科系羅盤</span>
+
+    <!-- Header & Navigation -->
+    <header class="bg-white/90 backdrop-blur-sm sticky top-0 z-50 shadow-md">
+        <nav class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-20">
+                <div class="text-2xl font-bold text-gray-800">
+                    <a href="#hero">策略選擇指南</a>
                 </div>
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="#overview" class="nav-link border-b-2 border-transparent pb-1">總覽比較</a>
-                    <a href="#academics" class="nav-link border-b-2 border-transparent pb-1">學術課程</a>
-                    <a href="#career" class="nav-link border-b-2 border-transparent pb-1">職涯薪資</a>
-                    <a href="#trends" class="nav-link border-b-2 border-transparent pb-1">產業趨勢</a>
-                    <a href="#interdisciplinary" class="nav-link border-b-2 border-transparent pb-1">跨域學習</a>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#overview" class="nav-link text-gray-600 font-medium border-b-2 border-transparent pb-1">宏觀戰略</a>
+                    <a href="#deep-dive" class="nav-link text-gray-600 font-medium border-b-2 border-transparent pb-1">科系深掘</a>
+                    <a href="#ultimate-challenge" class="nav-link text-gray-600 font-medium border-b-2 border-transparent pb-1">終極挑戰</a>
+                    <a href="#recommendation" class="nav-link text-gray-600 font-medium border-b-2 border-transparent pb-1">個人化建議</a>
                 </div>
                 <div class="md:hidden">
-                    <button id="mobile-menu-button" class="text-gray-600 hover:text-[#4A908A]">
+                    <button id="mobile-menu-button" class="text-gray-700 focus:outline-none">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                     </button>
                 </div>
             </div>
+            <div id="mobile-menu" class="hidden md:hidden pb-4">
+                <a href="#overview" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 rounded">宏觀戰略</a>
+                <a href="#deep-dive" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 rounded">科系深掘</a>
+                <a href="#ultimate-challenge" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 rounded">終極挑戰</a>
+                <a href="#recommendation" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 rounded">個人化建議</a>
+            </div>
         </nav>
-        <div id="mobile-menu" class="hidden md:hidden">
-            <a href="#overview" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100">總覽比較</a>
-            <a href="#academics" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100">學術課程</a>
-            <a href="#career" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100">職涯薪資</a>
-            <a href="#trends" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100">產業趨勢</a>
-            <a href="#interdisciplinary" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100">跨域學習</a>
-        </div>
     </header>
 
-    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <section id="overview" class="mb-16 scroll-mt-20">
-            <h1 class="text-3xl md:text-4xl font-bold text-center mb-4 text-[#6E8598]">頂大材料 vs 中字輩電機</h1>
-            <p class="text-center text-gray-600 max-w-3xl mx-auto mb-8">
-                本儀表板旨在深入比較台灣頂尖大學的材料科學系與中字輩大學的電機工程學系，從學術、職涯到產業趨勢，提供全面性的互動式分析，協助您做出最適合的選擇。
-            </p>
-
-            <div class="flex justify-center items-center space-x-4 mb-12">
-                <span id="toggle-label-materials" class="font-semibold text-lg text-[#4A908A]">材料科學</span>
-                <div id="discipline-toggle" class="relative w-32 h-8 flex items-center bg-gray-200 rounded-full cursor-pointer p-1">
-                    <div id="toggle-bg" class="toggle-bg absolute top-0 left-0 w-full h-full rounded-full"></div>
-                    <div class="w-1/2 h-full rounded-full z-10"></div>
-                    <div class="w-1/2 h-full rounded-full z-10"></div>
-                </div>
-                <span id="toggle-label-ee" class="font-semibold text-lg text-gray-500">電機工程</span>
+    <main>
+        <!-- Hero Section -->
+        <section id="hero" class="py-24 bg-gray-50">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">將科系選擇視為一項策略性職業投資</h1>
+                <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">一份針對中正電機、成大材料與成大光電的深度分析報告，助您在南部半導體S廊帶的浪潮中，做出最明智的決策。</p>
             </div>
+        </section>
 
-            <div class="grid md:grid-cols-2 gap-8 items-center">
-                <div>
-                    <h2 class="text-2xl font-bold mb-4 text-[#4A908A]">核心差異速覽</h2>
-                    <div id="overview-content"></div>
+        <!-- Overview Section -->
+        <section id="overview" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl font-bold section-title inline-block">戰略宏觀：院校聲望與產業地理</h2>
+                    <p class="mt-4 text-gray-600 max-w-3xl mx-auto">大學的品牌價值與地理位置是影響未來發展的關鍵。成功大學位於南部半導體S廊帶核心，享有主場優勢，而中正大學則提供了穩固的基礎工程教育。</p>
                 </div>
-                <div class="chart-container">
-                    <canvas id="salaryChart"></canvas>
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div class="card p-6">
+                        <h3 class="font-bold text-xl text-center mb-4">全球工程領域聲望比較 (QS 2025)</h3>
+                        <div class="chart-container">
+                            <canvas id="rankingChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="card p-6">
+                            <h3 class="font-bold text-xl mb-2 text-blue-800">國立成功大學 (NCKU)</h3>
+                            <p class="text-gray-700"><strong class="text-gray-900">品牌價值：</strong>台灣頂尖，全國校長互評工程領域第一，是產業界公認的領導者。</p>
+                            <p class="text-gray-700"><strong class="text-gray-900">地理優勢：</strong>位於南部半導體S廊帶核心，與台積電等龍頭企業連結緊密，提供豐富實習與研究機會。</p>
+                        </div>
+                        <div class="card p-6">
+                            <h3 class="font-bold text-xl mb-2 text-green-800">國立中正大學 (CCU)</h3>
+                            <p class="text-gray-700"><strong class="text-gray-900">品牌價值：</strong>在特定領域如通訊、SoC具備良好聲望，培養通才型工程師。</p>
+                            <p class="text-gray-700"><strong class="text-gray-900">地理優勢：</strong>位於S廊帶邊緣，提供穩健的學術環境，但與核心產業聚落連結稍弱。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Deep Dive Section -->
+        <section id="deep-dive" class="py-20 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold section-title inline-block">科系深掘：三種工程哲學的全面剖析</h2>
+                    <p class="mt-4 text-gray-600 max-w-3xl mx-auto">點擊下方頁籤，深入了解每個科系獨特的課程哲學、研究強項與職涯軌跡。</p>
+                </div>
+
+                <!-- Tabs -->
+                <div class="flex justify-center space-x-2 md:space-x-4 mb-8">
+                    <button class="tab-button active font-bold py-3 px-6 rounded-full" data-tab="ccu-ee">中正電機</button>
+                    <button class="tab-button font-bold py-3 px-6 rounded-full" data-tab="ncku-mse">成大材料</button>
+                    <button class="tab-button font-bold py-3 px-6 rounded-full" data-tab="ncku-dps">成大光電</button>
+                </div>
+
+                <!-- Tab Content -->
+                <div class="card p-8 md:p-12">
+                    <!-- CCU EE Content -->
+                    <div id="ccu-ee" class="tab-content active">
+                        <h3 class="text-2xl font-bold mb-2">國立中正大學 電機工程學系</h3>
+                        <p class="text-lg text-blue-600 font-semibold mb-6">核心哲學：「廣度優先」的經典電機模型</p>
+                        <div class="prose max-w-none">
+                            <p>中正電機的核心目標是培養具備扎實基礎、能適應多元產業需求的通用型電機工程師。其課程結構讓學生在穩固的基礎上，能自由探索並組合不同領域的知識，建立寬廣的技術視野。</p>
+                            <h4>課程架構與八大學程</h4>
+                            <p>在修畢微積分、普物、電路學、電子學、電磁學等基礎後，學生可從八大專業學程中選擇，涵蓋現代電機工程所有核心分支：</p>
+                            <ul>
+                                <li>電磁晶片、信號與智慧計算、計算機工程、晶片系統(SoC)</li>
+                                <li>綠色電能系統、能源系統、通訊網路、通訊系統</li>
+                            </ul>
+                            <h4>研究焦點與強項</h4>
+                            <p>該系在特定領域建立顯著優勢，尤其在「通訊」領域師資陣容整齊，與通訊系整合研究；「電磁晶片」的陣列天線研究被譽為「獨步學界」；在「系統晶片(SoC)」的低功耗電路與生醫晶片方面也享有聲望。</p>
+                            <h4>碩士路徑與職涯軌跡</h4>
+                            <p>畢業生可順利銜接所有電機相關研究所，職涯出路寬廣，能勝任軟體、韌體、IC設計、通訊、電力等多種工程師崗位。這是一條穩健可靠的「通才之路」，確保畢業生在就業市場上具有良好的適應性。</p>
+                        </div>
+                    </div>
+                    <!-- NCKU MSE Content -->
+                    <div id="ncku-mse" class="tab-content">
+                        <h3 class="text-2xl font-bold mb-2">國立成功大學 材料科學及工程學系</h3>
+                        <p class="text-lg text-green-600 font-semibold mb-6">核心哲學：「深度優先」的基礎科學模型</p>
+                        <div class="prose max-w-none">
+                            <p>成大材料的定位是「工業之母」，是一門根本性的上游學科。其教學核心並非「如何建構系統」，而是探究「為何材料會表現出特定行為」的根本原理，從原子層面理解並調控物質特性。</p>
+                            <h4>課程架構與特色</h4>
+                            <p>必修課體現了此哲學，包括材料熱力學、結晶學、相變態等。更具特色的是，將《量子物理導論》與《有機化學導論》列為大學部必修，強調從第一性原理出發解決問題的能力。</p>
+                            <h4>研究焦點與強項</h4>
+                            <p>研究範疇涵蓋金屬、陶瓷、高分子等，但重點放在與當代科技息息相關的尖端材料，特別是電子材料、光電材料、半導體材料。許多教授的專長直接對應半導體製程的關鍵環節。</p>
+                            <h4>碩士路徑與職涯軌跡</h4>
+                            <p>這是直通半導體產業的快車道。畢業生是台積電、應用材料、日月光等企業競相爭取的人才，主要擔任製程、研發、良率與可靠度工程師。這條「製程工程師之路」提供通往半導體製造核心的康莊大道。</p>
+                        </div>
+                    </div>
+                    <!-- NCKU DPS Content -->
+                    <div id="ncku-dps" class="tab-content">
+                        <h3 class="text-2xl font-bold mb-2">國立成功大學 光電科學與工程學系</h3>
+                        <p class="text-lg text-orange-600 font-semibold mb-6">核心哲學：「跨域整合」的問題導向領域</p>
+                        <div class="prose max-w-none">
+                            <p>成大光電是座落於物理、電機與材料科學交會點的高度跨領域學科。它是一個典型的「問題導向」領域，旨在培養能夠動手解決實際問題的工程師，掌握從基礎物理到尖端系統應用的完整知識鏈。</p>
+                            <h4>課程架構與四大支柱</h4>
+                            <p>課程圍繞四大專業領域設計，對應當代科技發展的核心戰場：</p>
+                            <ul>
+                                <li><strong>光電科學：</strong>物理基礎模組，提供理論根基。</li>
+                                <li><strong>資訊與顯示光電：</strong>系統應用模組，對應AR/VR、高速網路等。</li>
+                                <li><strong>奈米與綠能光電：</strong>元件核心模組，與半導體製程高度重疊。</li>
+                                <li><strong>生醫光電：</strong>新興前沿模組，應用於醫療診斷。</li>
+                            </ul>
+                            <h4>研究焦點與強項</h4>
+                            <p>師資研究方向走在科技前沿，涵蓋積體化量子光學、用於AR的超穎介面(Metasurface)、先進半導體材料、高功率雷射系統等。強調工程應用與系統實現。</p>
+                            <h4>碩士路徑與職涯軌跡</h4>
+                            <p>畢業生因其獨特的跨領域知識，成為半導體製造(尤其光學微影)、顯示技術(Micro-LED, OLED)、新興光電應用(光達, 感測器)等高成長產業的搶手人才。這條「系統創新者之路」適合對利用晶片與光來與世界互動充滿好奇心的學生。</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <hr class="my-16 border-gray-200">
-
-        <section id="academics" class="mb-16 scroll-mt-20">
-            <h2 class="text-3xl font-bold text-center mb-8"><span class="section-title-icon">🎓</span> 學術與課程</h2>
-             <p class="text-center text-gray-600 max-w-3xl mx-auto mb-8">
-                此區塊深入探討兩個科系的學術聲譽、研究重點與核心課程。您可以透過下方的頁籤選擇特定大學，查看其詳細的學術特色與課程規劃，了解不同學校的專長與教學方向。
-            </p>
-            <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
-                <div class="flex justify-center mb-6 border-b border-gray-200">
-                    <div id="university-tabs" class="flex flex-wrap -mb-px"></div>
+        <!-- Ultimate Challenge Section -->
+        <section id="ultimate-challenge" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl font-bold section-title inline-block">終極挑戰：成大電機雙主修之路</h2>
+                    <p class="mt-4 text-gray-600 max-w-3xl mx-auto">對於學有餘力且志向遠大的成大學生，雙主修電機系能將「深度」與「廣度」完美結合，打造產業界極度渴求的「T型人才」。</p>
                 </div>
-                <div id="academics-content"></div>
+                <div class="grid lg:grid-cols-2 gap-10">
+                    <div class="card p-8">
+                        <h3 class="text-xl font-bold mb-6">申請門檻：為頂尖學子設立的高標準</h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mr-3 mt-1 font-bold">✓</span>
+                                <div><strong class="text-gray-800">學術門檻：</strong> 前一學年平均達80分以上，或班排名前25%。</div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mr-3 mt-1 font-bold">✓</span>
+                                <div><strong class="text-gray-800">關鍵文件：</strong> 歷年成績單、自傳，以及一份詳盡且可行的修課規劃。</div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mr-3 mt-1 font-bold">✓</span>
+                                <div><strong class="text-gray-800">學分負荷：</strong> 需額外修畢電機系指定的<span class="text-red-600 font-bold">至少51個</span>專業學分，包含所有專業必修。</div>
+                            </li>
+                        </ul>
+                        <p class="mt-6 text-sm text-gray-500">這是一場學術耐力的嚴峻考驗，僅適合學術能力最頂尖且決心堅定的學生。</p>
+                    </div>
+                    <div class="card p-8 bg-gray-50">
+                        <h3 class="text-xl font-bold mb-6">戰略回報：打造無可匹敵的跨領域將才</h3>
+                        <div class="space-y-6">
+                            <div>
+                                <h4 class="font-semibold text-lg">材料 + 電機 雙主修</h4>
+                                <p class="text-gray-700">創造最理想的<strong>「製程整合工程師」</strong>。既懂材料科學，又理解電路效能，能完美扮演晶圓廠與設計公司之間的橋樑，是台積電等公司確保先進製程順利量產的核心人物。</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg">光電 + 電機 雙主修</h4>
+                                <p class="text-gray-700">創造最完美的<strong>「光電系統架構師」</strong>。既精通光電元件物理，又掌握後端電子訊號處理。是設計自駕車光達、AR/VR頭盔等複雜光電系統的絕佳人選。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <hr class="my-16 border-gray-200">
-
-        <section id="career" class="mb-16 scroll-mt-20">
-            <h2 class="text-3xl font-bold text-center mb-8"><span class="section-title-icon">💼</span> 職涯與薪資</h2>
-             <p class="text-center text-gray-600 max-w-3xl mx-auto mb-8">
-                探索畢業後的多元出路與薪資潛力。這裡展示了兩個科系對應的熱門職缺以及薪資範圍，特別突顯了碩士學歷對職涯發展的顯著加成效益。
-            </p>
-            <div id="career-content"></div>
-        </section>
-
-        <hr class="my-16 border-gray-200">
-
-        <section id="trends" class="mb-16 scroll-mt-20">
-            <h2 class="text-3xl font-bold text-center mb-8"><span class="section-title-icon">📈</span> 產業趨勢與人才需求</h2>
-            <p class="text-center text-gray-600 max-w-3xl mx-auto mb-8">
-                了解當前半導體、AI、綠色能源等熱門產業的人才需求狀況。圖表顯示了關鍵產業的人力缺口，而下方的卡片則分析了這些趨勢如何影響材料與電機領域的專業人才。
-            </p>
-            <div class="grid md:grid-cols-2 gap-8 items-center">
-                <div class="chart-container h-[350px] md:h-[400px]">
-                    <canvas id="talentDemandChart"></canvas>
+        <!-- Recommendation Section -->
+        <section id="recommendation" class="py-20 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl font-bold section-title inline-block">個人化建議：您是哪一種工程師原型？</h2>
+                    <p class="mt-4 text-gray-600 max-w-3xl mx-auto">最終的抉擇應回歸您的內心。看看哪一種探索世界的方式，最能點燃您的熱情。</p>
                 </div>
-                <div id="trends-content"></div>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="card p-8 text-center">
+                        <div class="text-6xl mb-4">🏗️</div>
+                        <h3 class="text-2xl font-bold mb-2">核心架構師 (建構者)</h3>
+                        <p class="text-gray-600 mb-4">熱愛邏輯、演算法與系統設計，渴望親手打造機器的「大腦」。</p>
+                        <p class="font-bold text-blue-700 mt-auto pt-4 border-t">推薦路徑：中正電機 或 成大光電/材料 + 雙主修電機</p>
+                    </div>
+                    <div class="card p-8 text-center">
+                        <div class="text-6xl mb-4">🔬</div>
+                        <h3 class="text-2xl font-bold mb-2">製程創新者 (製造者)</h3>
+                        <p class="text-gray-600 mb-4">對物理化學有濃厚興趣，著迷於探索物質的微觀世界。</p>
+                        <p class="font-bold text-green-700 mt-auto pt-4 border-t">推薦路徑：成功大學 材料系</p>
+                    </div>
+                    <div class="card p-8 text-center">
+                        <div class="text-6xl mb-4">🚀</div>
+                        <h3 class="text-2xl font-bold mb-2">前沿探索者 (整合者)</h3>
+                        <p class="text-gray-600 mb-4">對尖端應用充滿好奇，樂於在學科邊界進行探索與整合。</p>
+                        <p class="font-bold text-orange-700 mt-auto pt-4 border-t">推薦路徑：成功大學 光電系</p>
+                    </div>
+                </div>
             </div>
-        </section>
-        
-        <hr class="my-16 border-gray-200">
-
-        <section id="interdisciplinary" class="scroll-mt-20">
-            <h2 class="text-3xl font-bold text-center mb-8"><span class="section-title-icon">🔗</span> 跨域學習與第二專長</h2>
-            <p class="text-center text-gray-600 max-w-3xl mx-auto mb-8">
-                在科技快速融合的時代，跨領域能力是脫穎而出的關鍵。本區塊總結了各大學申請雙主修與輔系的門檻，並點出材料與電機在專業知識上的共通性與整合潛力。
-            </p>
-            <div id="interdisciplinary-content"></div>
         </section>
     </main>
 
-    <footer class="bg-gray-800 text-white mt-16">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-sm">
-            <p>&copy; 2025 科系羅盤. All rights reserved. 資訊僅供參考。</p>
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center text-sm">
+            <p>&copy; 2025 台灣頂尖工程領域策略選擇指南</p>
+            <p class="opacity-75 mt-2">本網頁資訊基於公開報告分析，僅供策略參考。所有招生與課程資訊請以各校官方公告為準。</p>
         </div>
     </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const data = {
-                materials: {
-                    overview: {
-                        title: "材料科學：工業之母",
-                        description: "材料系在基礎科學（物理、化學）與工程應用間取得平衡。研究範疇廣泛，涵蓋金屬、陶瓷、半導體、光電、生醫、能源等領域，強調從微觀層面理解並開發新材料。",
-                        points: [
-                            "<strong>學術取向：</strong> 著重實驗、材料分析與開發。",
-                            "<strong>核心技能：</strong> 材料結構與性質分析、製程設計、性能檢測。",
-                            "<strong>產業連結：</strong> 半導體、光電、生醫、傳統工業等。"
-                        ]
-                    },
-                    academics: [
-                        { name: "清華大學", focus: "台灣首創材料系，學術地位領導，研究領域廣泛，涵蓋能源、光電、微電子、奈米、生醫等，並設有貴重儀器中心。", courses: "材料科學與工程、材料熱力學、結晶繞射概論、晶體缺陷、物理冶金、高分子電子學等。" },
-                        { name: "陽明交通大學", focus: "SCI論文影響因子全國第一，專精於電子、生醫、材料計算AI領域。研究成果與美國頂尖名校並駕齊驅。", courses: "材料科學導論、物理冶金、晶體結構與繞射、半導體製程、奈米生醫材料、能源材料等。" },
-                        { name: "成功大學", focus: "國科會論文統計全國第一，學術研究成果豐碩。研究涵蓋金屬、陶瓷、高分子、光電、生醫、能源等傳統與尖端材料。", courses: "材料科學導論、材料工程力學、相變態導論、材料分析、量子物理導論、有機化學導論等。" }
-                    ],
-                    career: {
-                        title: "多元產業的關鍵推手",
-                        description: "畢業生可進入半導體、光電、新能源、化工、航太、生醫等多種產業，扮演新產品開發、製程優化、性能提升的關鍵角色。",
-                        jobs: [
-                            { title: "材料製程研發工程師", salary: "5-8萬 / 月" },
-                            { title: "半導體材料工程師", salary: "6-9萬 / 月" },
-                            { title: "生醫材料工程師", salary: "4-6萬 / 月" },
-                            { title: "專利/技術顧問", salary: "5-7.5萬 / 月" }
-                        ],
-                        masters_advantage: "碩士學歷對職涯有顯著加分，平均月薪可達 <strong>6.7萬元</strong>，幾乎是學士的兩倍。高階研發崗位普遍要求碩士以上學歷。"
-                    },
-                    trends: {
-                        semiconductor: "在半導體產業中，材料是製程的根本。從晶圓製造到封裝，都需要材料工程師進行開發、分析與品管，確保良率與性能。",
-                        green_energy: "綠色能源與電動車的發展高度依賴新材料。例如，高效太陽能電池、高能量密度電池、輕量化車身結構等，都是材料科學的重點研究方向。"
-                    },
-                    interdisciplinary_summary: "材料科學與電機工程在半導體、光電領域高度融合。材料系學生若能輔修電機或資工，掌握電路、程式設計等技能，將在就業市場上極具競爭力。陽明交大材料系設有『三一跨域學程』，即是此趨勢的最佳體現。"
-                },
-                ee: {
-                    overview: {
-                        title: "電機工程：科技核心",
-                        description: "電機系以『電』為核心，應用範圍極廣，涵蓋電力、通訊、晶片設計、AI、自動控制等。課程強調電路設計、程式設計、系統整合與問題解決能力。",
-                        points: [
-                            "<strong>學術取向：</strong> 著重電學理論與系統層面應用。",
-                            "<strong>核心技能：</strong> 電路設計、訊號處理、程式編寫、系統整合。",
-                            "<strong>產業連結：</strong> 半導體、資通訊、AI、自動化等。"
-                        ]
-                    },
-                    academics: [
-                        { name: "中央大學", focus: "研究領域涵蓋IC設計、奈米電子、光電通訊、控制、生醫及電波。在智慧生活、身心照護、永續綠能三大主軸上推動前瞻研究。", courses: "電子學、電路學、電磁學、信號與系統、數位系統導論、控制系統、通訊原理等。" },
-                        { name: "中興大學", focus: "課程涵蓋通訊、資訊、控制、電力電子、光電半導體、IC設計等完整領域。研究重點包括微機電、機器視覺、智慧農業、AI應用等。", courses: "交換電路與邏輯設計、工程數學、電磁學、自動控制、通訊系統、VLSI設計等。" },
-                        { name: "中正大學", focus: "在通訊、系統晶片(SoC)、電能處理領域具領導地位。陣列天線、超低電壓電路、直流供電研究為國內重鎮。", courses: "交換電路與邏輯設計、訊號與系統、電磁科技導論、再生能源導論、VLSI設計導論等。" },
-                        { name: "中山大學", focus: "在智慧電網、綠色能源、電力電子領域研究成果豐碩，主持多項國家型能源計畫。課程涵蓋電機所有子領域，師資陣容堅強。", courses: "數位系統設計、控制系統、通訊系統、電力系統、半導體元件、微波工程、AI導論等。" }
-                    ],
-                    career: {
-                        title: "高科技產業的最愛",
-                        description: "畢業生主要集中在半導體、資通訊、電子產品設計、自動化、AI等高科技核心領域，是各大科技廠爭相延攬的對象。",
-                        jobs: [
-                            { title: "IC設計工程師", salary: "7-15萬+ / 月" },
-                            { title: "韌體/軟體工程師", salary: "6-10萬 / 月" },
-                            { title: "RF通訊工程師", salary: "6-9萬 / 月" },
-                            { title: "自動化/控制工程師", salary: "5-8萬 / 月" }
-                        ],
-                        masters_advantage: "碩士畢業生起薪顯著高於學士，電機碩士起薪約 <strong>5.6萬元</strong>，與學士差異達1.8萬元。IC設計等高薪職位幾乎都要求碩士學歷。"
-                    },
-                    trends: {
-                        semiconductor: "電機是半導體產業的核心。IC設計、電路佈局、製程整合、測試驗證等關鍵職位，皆以電機人才為主力。",
-                        green_energy: "電機系在綠能領域扮演要角，負責智慧電網規劃、電力電子轉換器設計、儲能系統控制、電動車馬達與電控系統開發等。"
-                    },
-                    interdisciplinary_summary: "電機工程與材料、物理、資工等領域密不可分。了解半導體材料特性有助於元件設計；結合資工的AI與演算法知識，則能開創更多智慧應用。跨領域學習能讓電機背景的學生在系統設計上更具宏觀視野。"
-                }
-            };
-
-            let currentDiscipline = 'materials';
-            let salaryChart, talentDemandChart;
-
-            const overviewContent = document.getElementById('overview-content');
-            const universityTabs = document.getElementById('university-tabs');
-            const academicsContent = document.getElementById('academics-content');
-            const careerContent = document.getElementById('career-content');
-            const trendsContent = document.getElementById('trends-content');
-            const interdisciplinaryContent = document.getElementById('interdisciplinary-content');
-            const toggle = document.getElementById('discipline-toggle');
-            const toggleBg = document.getElementById('toggle-bg');
-            const toggleLabelMaterials = document.getElementById('toggle-label-materials');
-            const toggleLabelEe = document.getElementById('toggle-label-ee');
-
-            function createSalaryChart() {
-                const ctx = document.getElementById('salaryChart').getContext('2d');
-                if (salaryChart) {
-                    salaryChart.destroy();
-                }
-                salaryChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['學士畢業', '碩士畢業'],
-                        datasets: [
-                            {
-                                label: '材料系月薪 (NT$)',
-                                data: [37000, 67000],
-                                backgroundColor: '#6E8598',
-                                borderColor: '#6E8598',
-                                borderWidth: 1
-                            },
-                            {
-                                label: '電機系月薪 (NT$)',
-                                data: [45000, 56000],
-                                backgroundColor: '#D9A477',
-                                borderColor: '#D9A477',
-                                borderWidth: 1
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: '學歷對薪資影響比較',
-                                font: { size: 16, weight: 'bold', family: "'Noto Sans TC', sans-serif" },
-                                color: '#333'
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        let label = context.dataset.label || '';
-                                        if (label) {
-                                            label += ': ';
-                                        }
-                                        if (context.parsed.y !== null) {
-                                            label += new Intl.NumberFormat('zh-TW', { style: 'currency', currency: 'TWD', minimumFractionDigits: 0 }).format(context.parsed.y);
-                                        }
-                                        return label;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: '平均月薪 (NT$)',
-                                    font: { family: "'Noto Sans TC', sans-serif" }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-            function createTalentDemandChart() {
-                const ctx = document.getElementById('talentDemandChart').getContext('2d');
-                 if (talentDemandChart) {
-                    talentDemandChart.destroy();
-                }
-                talentDemandChart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['研發類', '生產製造/品管', '操作/技術/維修'],
-                        datasets: [{
-                            label: '半導體人力缺口比例',
-                            data: [27, 29, 21],
-                            backgroundColor: ['#4A908A', '#6E8598', '#D9A477'],
-                            hoverOffset: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: '半導體產業主要人力缺口',
-                                font: { size: 16, weight: 'bold', family: "'Noto Sans TC', sans-serif" },
-                                color: '#333'
-                            },
-                            legend: {
-                                position: 'bottom',
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        let label = context.label || '';
-                                        if (label) {
-                                            label += ': ';
-                                        }
-                                        if (context.parsed !== null) {
-                                            label += context.parsed + '%';
-                                        }
-                                        return label;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-            function updateContent() {
-                const d = data[currentDiscipline];
-
-                overviewContent.innerHTML = `
-                    <h3 class="text-xl font-bold mb-3">${d.overview.title}</h3>
-                    <p class="text-gray-600 mb-4">${d.overview.description}</p>
-                    <ul class="space-y-2 text-gray-700">
-                        ${d.overview.points.map(p => `<li class="flex items-start"><span class="text-[#4A908A] mr-2 mt-1">✓</span><span>${p}</span></li>`).join('')}
-                    </ul>
-                `;
-
-                universityTabs.innerHTML = d.academics.map((uni, index) => `
-                    <button class="tab-button text-sm sm:text-base font-medium px-3 py-2 sm:px-4 sm:py-2.5 rounded-t-lg ${index === 0 ? 'active' : ''}" data-index="${index}">${uni.name}</button>
-                `).join('');
-                
-                updateAcademicsContent(0);
-
-                careerContent.innerHTML = `
-                    <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 mb-8">
-                        <h3 class="text-xl font-bold mb-4 text-[#6E8598]">${d.career.title}</h3>
-                        <p class="text-gray-600 mb-6">${d.career.description}</p>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                            ${d.career.jobs.map(job => `
-                                <div class="card bg-gray-50 p-4 rounded-lg text-center">
-                                    <h4 class="font-semibold text-[#4A908A]">${job.title}</h4>
-                                    <p class="text-sm text-gray-500">${job.salary}</p>
-                                </div>
-                            `).join('')}
-                        </div>
-                        <div class="bg-[#F8F7F4] p-4 rounded-lg border-l-4 border-[#D9A477]">
-                            <h4 class="font-bold text-lg mb-2">碩士學歷優勢</h4>
-                            <p class="text-gray-700">${d.career.masters_advantage}</p>
-                        </div>
-                    </div>
-                `;
-
-                trendsContent.innerHTML = `
-                    <div>
-                        <h3 class="text-xl font-bold mb-4 text-[#6E8598]">產業角色與機會</h3>
-                        <div class="space-y-4">
-                            <div class="card bg-white p-4 rounded-lg shadow-sm">
-                                <h4 class="font-semibold text-[#4A908A] mb-1">半導體產業</h4>
-                                <p class="text-sm text-gray-600">${d.trends.semiconductor}</p>
-                            </div>
-                            <div class="card bg-white p-4 rounded-lg shadow-sm">
-                                <h4 class="font-semibold text-[#4A908A] mb-1">綠能與電動車</h4>
-                                <p class="text-sm text-gray-600">${d.trends.green_energy}</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                interdisciplinaryContent.innerHTML = `
-                    <div class="grid md:grid-cols-2 gap-8">
-                        <div class="bg-white rounded-xl shadow-lg p-6">
-                            <h3 class="text-xl font-bold mb-4 text-[#6E8598]">科系整合潛力</h3>
-                            <p class="text-gray-600">${d.interdisciplinary_summary}</p>
-                        </div>
-                        <div class="bg-white rounded-xl shadow-lg p-6">
-                            <h3 class="text-xl font-bold mb-4 text-[#6E8598]">雙主修/輔系申請門檻概覽</h3>
-                            <ul class="space-y-2 text-sm text-gray-700">
-                                <li><strong>清/交/成/中央:</strong> 通常要求前一學年成績班排名前25%-40%或平均80分以上。</li>
-                                <li><strong>中興:</strong> 要求前一學年成績75分以上或班排名前20%。</li>
-                                <li><strong>中正/中山:</strong> 門檻由各系自訂，部分無限制，部分要求班排名前20%-25%。</li>
-                                <li class="mt-2 text-xs text-gray-500">*註: 詳細規定請以各校教務處公告為準。</li>
-                            </ul>
-                        </div>
-                    </div>
-                `;
-
-                document.querySelectorAll('#university-tabs .tab-button').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const index = e.target.dataset.index;
-                        document.querySelectorAll('#university-tabs .tab-button').forEach(btn => btn.classList.remove('active'));
-                        e.target.classList.add('active');
-                        updateAcademicsContent(index);
-                    });
-                });
-            }
-
-            function updateAcademicsContent(index) {
-                const uni = data[currentDiscipline].academics[index];
-                academicsContent.innerHTML = `
-                    <div class="transition-opacity duration-300">
-                        <h4 class="text-lg font-bold text-[#4A908A] mb-2">${uni.name} - 研究重點</h4>
-                        <p class="text-gray-600 mb-4 text-sm sm:text-base">${uni.focus}</p>
-                        <h4 class="text-lg font-bold text-[#4A908A] mb-2">核心課程範例</h4>
-                        <p class="text-gray-600 text-sm sm:text-base">${uni.courses}</p>
-                    </div>
-                `;
-            }
-
-            toggle.addEventListener('click', () => {
-                if (currentDiscipline === 'materials') {
-                    currentDiscipline = 'ee';
-                    toggleBg.classList.add('translate-x-full');
-                    toggleLabelMaterials.classList.remove('text-[#4A908A]');
-                    toggleLabelMaterials.classList.add('text-gray-500');
-                    toggleLabelEe.classList.add('text-[#4A908A]');
-                    toggleLabelEe.classList.remove('text-gray-500');
-                } else {
-                    currentDiscipline = 'materials';
-                    toggleBg.classList.remove('translate-x-full');
-                    toggleLabelEe.classList.remove('text-[#4A908A]');
-                    toggleLabelEe.classList.add('text-gray-500');
-                    toggleLabelMaterials.classList.add('text-[#4A908A]');
-                    toggleLabelMaterials.classList.remove('text-gray-500');
-                }
-                updateContent();
-            });
-            
+            // Mobile Menu
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
             mobileMenuButton.addEventListener('click', () => {
                 mobileMenu.classList.toggle('hidden');
             });
-            
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    document.querySelector(this.getAttribute('href')).scrollIntoView({
-                        behavior: 'smooth'
+
+            // Tabs
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    const tabId = button.dataset.tab;
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === tabId) {
+                            content.classList.add('active');
+                        }
                     });
-                    if(mobileMenu.classList.contains('hidden') === false){
-                        mobileMenu.classList.add('hidden');
-                    }
                 });
             });
 
-            window.addEventListener('scroll', () => {
-                const sections = document.querySelectorAll('section');
-                const navLinks = document.querySelectorAll('.nav-link');
-                let current = '';
-
-                sections.forEach(section => {
-                    const sectionTop = section.offsetTop;
-                    if (pageYOffset >= sectionTop - 80) {
-                        current = section.getAttribute('id');
+            // Ranking Chart
+            const rankingCtx = document.getElementById('rankingChart').getContext('2d');
+            new Chart(rankingCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['成功大學', '中正大學'],
+                    datasets: [{
+                        label: '全球排名',
+                        data: [189, 501], // Use 501 to represent >500
+                        backgroundColor: [
+                            'rgba(0, 123, 255, 0.6)',
+                            'rgba(40, 167, 69, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(0, 123, 255, 1)',
+                            'rgba(40, 167, 69, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) { label += ': '; }
+                                    if (context.parsed.y !== null) {
+                                        if (context.parsed.y > 500) {
+                                            label += '未進入前500名';
+                                        } else {
+                                            label += '全球第' + context.parsed.y + '名';
+                                        }
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            reverse: true,
+                            title: {
+                                display: true,
+                                text: '全球排名 (數字越小越好)'
+                            },
+                            ticks: {
+                                callback: function(value, index, values) {
+                                    return value > 500 ? '>500' : value;
+                                }
+                            }
+                        }
                     }
-                });
-
-                navLinks.forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href').includes(current)) {
-                        link.classList.add('active');
-                    }
-                });
+                }
             });
-
-            updateContent();
-            createSalaryChart();
-            createTalentDemandChart();
         });
     </script>
 </body>
