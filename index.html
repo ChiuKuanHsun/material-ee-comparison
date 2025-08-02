@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>頂大材料 vs 中字輩電機：互動式資訊圖表</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Vibrant & Professional -->
+    <!-- Application Structure Plan: A single-page, scrollable infographic with a clear narrative flow. Sections include: 1) A high-level overview with key stats. 2) A comparative salary bar chart. 3) A deep dive into academic focus for each university group. 4) A look at career paths and industry trends, visualized with a donut chart for talent demand. 5) A section on interdisciplinary studies, showing the overlap between fields. This structure was chosen to guide the user from broad comparisons to specific details, telling a coherent story with the data. -->
+    <!-- Visualization & Content Choices: 
+        - Data Point: Salary Comparison -> Goal: Compare -> Viz: Bar Chart (Chart.js) -> Justification: Best for direct comparison of salary figures between two groups and two levels (Bachelor's vs. Master's).
+        - Data Point: Semiconductor Talent Demand -> Goal: Show Composition -> Viz: Donut Chart (Chart.js) -> Justification: Effectively shows the proportional breakdown of talent needs in a key industry.
+        - Data Point: University Details -> Goal: Organize -> Viz: Styled Cards/Lists (HTML/CSS) -> Justification: Presents dense textual information in a structured, readable format without clutter.
+        - Data Point: Interdisciplinary Overlap -> Goal: Show Relationships -> Viz: Structured HTML/CSS Diagram -> Justification: Visually represents the connection between the two fields without using prohibited SVG/Mermaid.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+        .header-bg {
+            background-color: #003f5c;
+        }
+        .section-title {
+            color: #003f5c;
+        }
+        .stat-card {
+            background-color: #ffffff;
+            border-left: 5px solid #ffa600;
+        }
+        .stat-number {
+            color: #ffa600;
+        }
+        .highlight-text {
+            color: #bc5090;
+        }
+        .card {
+            background-color: white;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 450px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .flow-diagram-box {
+            border: 2px solid #003f5c;
+            background-color: #f0f8ff;
+        }
+        .flow-diagram-arrow {
+            color: #ffa600;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="header-bg text-white text-center py-12 px-4">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">頂大材料 vs 中字輩電機</h1>
+        <p class="max-w-3xl mx-auto text-lg text-gray-200">一份全面的互動式分析報告，深入探討學術、職涯與產業趨勢，助您做出明智的升學選擇。</p>
+    </header>
+
+    <main class="container mx-auto mt-[-40px] px-4">
+        
+        <section id="overview" class="mb-16">
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="card p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-bold section-title mb-4">材料科學：工業之母</h2>
+                    <p class="mb-4">在基礎科學（物理、化學）與工程應用間取得平衡，研究範疇廣泛，從微觀層面理解並開發新材料，是半導體、光電、生醫等產業的基石。</p>
+                    <div class="stat-card p-4 rounded-lg">
+                        <p class="text-lg font-semibold">碩士學歷薪資躍升</p>
+                        <p class="text-3xl font-bold stat-number">平均月薪 ≈ NT$ 67,000</p>
+                        <p class="text-sm text-gray-600">相較學士畢業生，薪資近乎翻倍，高階研發職位必備。</p>
+                    </div>
+                </div>
+                <div class="card p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-bold section-title mb-4">電機工程：科技核心</h2>
+                    <p class="mb-4">以「電」為核心，應用範圍極廣，強調電路設計、程式編寫與系統整合，是資通訊、AI、自動化產業的最愛。</p>
+                    <div class="stat-card p-4 rounded-lg">
+                        <p class="text-lg font-semibold">高薪產業敲門磚</p>
+                        <p class="text-3xl font-bold stat-number">碩士起薪 ≈ NT$ 56,000</p>
+                        <p class="text-sm text-gray-600">IC設計等高薪職位，碩士學歷為基本門檻。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="salary-comparison" class="mb-16 card p-6 md:p-8 rounded-xl shadow-lg">
+            <h2 class="text-3xl font-bold text-center section-title mb-2">學歷對薪資的影響力</h2>
+            <p class="text-center text-gray-600 mb-6 max-w-2xl mx-auto">無論選擇哪個科系，攻讀碩士學位都能顯著提升起薪與職涯天花板。此圖表清晰呈現了學士與碩士畢業生在兩個領域的平均薪資差異。</p>
+            <div class="chart-container">
+                <canvas id="salaryComparisonChart"></canvas>
+            </div>
+        </section>
+
+        <section id="academics" class="mb-16">
+            <h2 class="text-3xl font-bold text-center section-title mb-8">學術殿堂：研究重點與課程特色</h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-bold text-center highlight-text">頂大材料系</h3>
+                    <div class="card p-6 rounded-lg">
+                        <h4 class="font-bold text-lg">國立清華大學</h4>
+                        <p class="text-sm text-gray-600">台灣首創，國際馳名(QS 58名)。研究涵蓋能源、光電、微電子、奈米、生醫等，設備精良。</p>
+                    </div>
+                    <div class="card p-6 rounded-lg">
+                        <h4 class="font-bold text-lg">國立陽明交通大學</h4>
+                        <p class="text-sm text-gray-600">研究影響力全國第一。專精電子、生醫、材料計算AI，頂尖期刊發表數量領先全台。</p>
+                    </div>
+                    <div class="card p-6 rounded-lg">
+                        <h4 class="font-bold text-lg">國立成功大學</h4>
+                        <p class="text-sm text-gray-600">論文統計全國第一。研究領域廣泛，涵蓋傳統與尖端材料，學風樸實務實。</p>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-bold text-center highlight-text">中字輩電機系</h3>
+                    <div class="card p-6 rounded-lg">
+                        <h4 class="font-bold text-lg">國立中央大學</h4>
+                        <p class="text-sm text-gray-600">領域全方位，在IC設計、機器人、智慧生活、永續綠能等主軸推動前瞻研究。</p>
+                    </div>
+                    <div class="card p-6 rounded-lg">
+                        <h4 class="font-bold text-lg">國立中興、中正、中山大學</h4>
+                        <p class="text-sm text-gray-600">各具特色：中興涵蓋完整領域，專精智慧農業；中正引領通訊與SoC研究；中山在智慧電網與綠能領域成果豐碩。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="career-trends" class="mb-16 card p-6 md:p-8 rounded-xl shadow-lg">
+            <h2 class="text-3xl font-bold text-center section-title mb-8">產業趨勢與人才需求</h2>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">半導體產業：人才缺口巨大</h3>
+                    <p class="text-gray-700 mb-4">台灣半導體產業面臨每月高達3.4萬人的人力缺口，其中研發與生產製造類職缺需求最為迫切。這為材料與電機背景的畢業生提供了絕佳的就業機會。</p>
+                    <ul class="list-disc list-inside space-y-2 text-gray-600">
+                        <li><strong class="text-[#003f5c]">研發類：</strong>需求約9,300人，亟需IC設計、材料開發等高階人才。</li>
+                        <li><strong class="text-[#003f5c]">製造/品管類：</strong>需求約10,000人，是產業運作的骨幹。</li>
+                        <li><strong class="text-[#003f5c]">操作/技術類：</strong>需求約7,200人，人才招募最為困難。</li>
+                    </ul>
+                </div>
+                <div class="chart-container h-80 md:h-96">
+                    <canvas id="talentDemandChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="interdisciplinary" class="mb-16">
+            <h2 class="text-3xl font-bold text-center section-title mb-8">未來關鍵：跨領域整合力</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">AI、綠能、電動車等趨勢模糊了學科界線。無論選擇材料或電機，具備跨領域知識（如程式設計、數據分析）將是脫穎而出的關鍵。</p>
+            <div class="flex flex-col md:flex-row items-center justify-center gap-4 text-center">
+                <div class="flow-diagram-box p-4 rounded-lg w-full md:w-1/3">
+                    <h4 class="font-bold text-lg">材料科學</h4>
+                    <p class="text-sm">物理、化學、製程</p>
+                </div>
+                <div class="text-4xl font-bold flow-diagram-arrow transform md:rotate-0 rotate-90">↔</div>
+                <div class="card p-4 rounded-lg shadow-md w-full md:w-1/3 bg-[#ffa600] text-white">
+                    <h4 class="font-bold text-lg">共同戰場</h4>
+                    <p class="text-sm">半導體、光電、能源、AI應用</p>
+                </div>
+                <div class="text-4xl font-bold flow-diagram-arrow transform md:rotate-0 rotate-90">↔</div>
+                <div class="flow-diagram-box p-4 rounded-lg w-full md:w-1/3">
+                    <h4 class="font-bold text-lg">電機工程</h4>
+                    <p class="text-sm">電路、程式、系統</p>
+                </div>
+            </div>
+            <div class="text-center mt-8">
+                <p class="text-gray-700">各大學皆提供雙主修、輔系等管道，申請門檻通常要求班排名前20%-40%或平均80分以上，鼓勵學生積極規劃。</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-[#003f5c] text-white text-center py-6 mt-12">
+        <p>資訊圖表由 AI 根據提供之報告生成，僅供參考。</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const wrapLabel = (label) => {
+                const maxLen = 16;
+                if (typeof label !== 'string' || label.length <= maxLen) {
+                    return label;
+                }
+                const words = label.split(' ');
+                const lines = [];
+                let currentLine = '';
+                for (const word of words) {
+                    if ((currentLine + ' ' + word).length > maxLen) {
+                        lines.push(currentLine);
+                        currentLine = word;
+                    } else {
+                        currentLine = currentLine ? currentLine + ' ' + word : word;
+                    }
+                }
+                lines.push(currentLine);
+                return lines;
+            };
+
+            const tooltipTitleCallback = (tooltipItems) => {
+                const item = tooltipItems[0];
+                let label = item.chart.data.labels[item.dataIndex];
+                if (Array.isArray(label)) {
+                    return label.join(' ');
+                }
+                return label;
+            };
+            
+            const salaryCtx = document.getElementById('salaryComparisonChart').getContext('2d');
+            new Chart(salaryCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['材料系', '電機系'],
+                    datasets: [
+                        {
+                            label: '學士畢業月薪',
+                            data: [37000, 45000],
+                            backgroundColor: '#665191',
+                            borderColor: '#665191',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '碩士畢業月薪',
+                            data: [67000, 56000],
+                            backgroundColor: '#ffa600',
+                            borderColor: '#ffa600',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                title: tooltipTitleCallback,
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += 'NT$ ' + context.parsed.y.toLocaleString();
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        legend: {
+                            position: 'top',
+                        },
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '平均月薪 (NT$)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return 'NT$ ' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const talentCtx = document.getElementById('talentDemandChart').getContext('2d');
+            new Chart(talentCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['生產製造/品管', '研發類', '操作/技術/維修'],
+                    datasets: [{
+                        label: '人力缺口比例',
+                        data: [29.4, 27.4, 21.3],
+                        backgroundColor: [
+                            '#003f5c',
+                            '#bc5090',
+                            '#ffa600'
+                        ],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                title: tooltipTitleCallback,
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed.toFixed(1) + '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        legend: {
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: true,
+                            text: '半導體產業主要人力缺口分佈',
+                            font: {
+                                size: 16
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
